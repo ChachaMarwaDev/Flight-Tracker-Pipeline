@@ -1,0 +1,43 @@
+services:
+  jupyter:
+    image: jupyter/scipy-notebook:latest
+    container_name: jupyter_container
+    ports:
+      - "8888:8888"
+    volumes:
+      - ./notebooks:/home/jovyan/work
+    networks:
+      - my_network
+
+  postgres:
+    image: postgres:18
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: mydatabase
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - my_network
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin_container
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8080:80"
+    networks:
+      - my_network
+    depends_on:
+      - postgres
+
+networks:
+  my_network:
+
+volumes:
+  postgres_data:
