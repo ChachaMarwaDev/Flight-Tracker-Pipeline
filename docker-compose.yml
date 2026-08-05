@@ -1,9 +1,11 @@
 services:
   jupyter:
-    image: jupyter/scipy-notebook:latest
+    build: .
     container_name: jupyter_container
     ports:
       - "8888:8888"
+    environment:
+      - JUPYTER_TOKEN=flighttracker123
     volumes:
       - ./notebooks:/home/jovyan/work
     networks:
