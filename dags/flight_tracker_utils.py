@@ -57,9 +57,8 @@ CREATE TABLE IF NOT EXISTS flight_positions (
 
 def ensure_table() -> None:
     """Create the flight_positions table if it doesn't exist yet. Safe to call every run."""
-    with engine.connect() as conn:
+    with engine.begin() as conn:
         conn.execute(text(CREATE_TABLE_SQL))
-        conn.commit()
 
 
 def fetch_states() -> pd.DataFrame:
@@ -98,8 +97,7 @@ def load_states(df: pd.DataFrame) -> None:
         ON CONFLICT (icao24, time_position) DO NOTHING
     """)
 
-    with engine.connect() as conn:
+    with engine.begin() as conn:
         conn.execute(insert_sql, records)
-        conn.commit()
 
     print(f"Attempted to load {len(df)} rows (duplicates skipped automatically).")
