@@ -40,9 +40,41 @@ services:
     depends_on:
       - postgres
 
+  airflow-db:
+    image: postgres:18
+    container_name: airflow_postgres
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+    volumes:
+      - airflow_db_data:/var/lib/postgresql
+    networks:
+      - my_network
+
+  airflow:
+    image: apache/airflow:2.10.2
+    container_name: airflow_container
+    depends_on:
+      - airflow-db
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@airflow-db/airflow
+      - AIRFLOW__CORE__LOAD_EXAMPLES=false
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+    ports:
+      - "8081:8080"
+    command: standalone
+    networks:
+      - my_network
+
 networks:
   my_network:
 
 volumes:
   postgres_data:
   pgadmin_data:
+  airflow_db_data:
